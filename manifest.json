@@ -3,7 +3,7 @@
 	"name": "Export Graph View",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Export your Obsidian vault's graph view to mermaid and dot format.",
+	"description": "Export your vault's graph view to mermaid and dot format.",
 	"author": "Sean McGhee",
 	"authorUrl": "https://www.seantiz.com",
 	"fundingUrl": "https://github.com/sponsors/seantiz",
