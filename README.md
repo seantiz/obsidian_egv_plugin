@@ -1,6 +1,8 @@
 # Obsidian Export Graph View Plugin
 
-This is a straightforward Obsidian community plugin for exporting your vault's notes and attachments metadata as graph files. You can export in either `.mmd` (Mermaid) format or `.dot` (for GraphViz) format for all your data viz habits.
+This is an Obsidian community plugin for exporting your vault's notes and attachments metadata as graph files.
+
+You can export in either `.mmd` (Mermaid) format or `.dot` (for GraphViz) format for all your data viz habits.
 
 There are a couple of other community plugins that can similar, but they enforce a pipeline where you have to use your exported data in a specific environment or program.
 
