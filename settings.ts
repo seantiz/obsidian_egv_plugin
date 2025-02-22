@@ -15,7 +15,7 @@ export class EGVSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName("Export Format")
+			.setName("Export format")
 			.setDesc("Choose whether to export as .mmd (Mermaid) or .dot (Graphviz) file")
 			.addDropdown((dropdown) =>
 				dropdown
@@ -29,7 +29,7 @@ export class EGVSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Include Orphaned Notes")
+			.setName("Include orphaned notes")
 			.setDesc("Default setting - toggle to include notes without relationships every time unless overriden")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.includeOrphans).onChange(async (value) => {
@@ -39,7 +39,7 @@ export class EGVSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Include Attachments")
+			.setName("Include attachments")
 			.setDesc(
 				"Default setting - toggle on to include all non-markdown files in this vault every time unless overriden",
 			)
@@ -51,7 +51,7 @@ export class EGVSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Maximum Nodes to Export")
+			.setName("Maximum nodes to export")
 			.setDesc(`Use the slide setting max number of nodes to export - this is a safeguard for huge vaults.`)
 			.addSlider((slider) =>
 				slider
@@ -65,7 +65,7 @@ export class EGVSettingTab extends PluginSettingTab {
 			);
 
 		const helpText = containerEl.createEl("p", {
-			text: "NOTE: Export Graph View will let you know how many notes and attachments are set to be exported.",
+			text: "NOTE: The plugin will let you know how many notes and attachments are set to be exported.",
 			cls: "help-text",
 		});
 
@@ -74,7 +74,7 @@ export class EGVSettingTab extends PluginSettingTab {
 		buttonContainer.style.marginTop = "50px";
 
 		const quickExportButton = new ButtonComponent(buttonContainer)
-			.setButtonText("Go to Export Graph View")
+			.setButtonText("Go to plugin")
 			.setCta()
 			.onClick(() => {
 				new EGVModal(this.app, this.plugin).open();

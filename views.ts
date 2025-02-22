@@ -1,5 +1,5 @@
 import EGVPlugin from "main";
-import { Modal, App, Setting, ButtonComponent } from "obsidian";
+import { Modal, App, Setting, ButtonComponent, normalizePath } from "obsidian";
 
 export class EGVModal extends Modal {
 	plugin: EGVPlugin;
@@ -18,21 +18,21 @@ export class EGVModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 
-		contentEl.createEl("h2", { text: "Export Graph View" });
+		contentEl.createEl("h2", { text: "Export graph view" });
 
 		contentEl.createEl("p", { text: "All files are exported to your vault's root folder", cls: "root-notice" });
 
 		new Setting(contentEl)
-			.setName("OPTIONAL: Filename")
+			.setName("Filename")
 			.setDesc("Enter a name (without extension) for your exported file")
 			.addText((text) =>
 				text.setValue(this.customFilename).onChange((value) => {
-					this.customFilename = value;
+					this.customFilename = normalizePath(value);
 				}),
 			);
 
 		new Setting(contentEl)
-			.setName("Include Orphaned Notes")
+			.setName("Include orphaned notes")
 			.setDesc("Toggle on to include notes without relationships")
 			.addToggle((toggle) =>
 				toggle.setValue(this.includeOrphans).onChange((value) => {
@@ -41,7 +41,7 @@ export class EGVModal extends Modal {
 			);
 
 		new Setting(contentEl)
-			.setName("Include Attachments")
+			.setName("Include attachments")
 			.setDesc("Toggle on to include all non-markdown files from this vault")
 			.addToggle((toggle) =>
 				toggle.setValue(this.includeAttachments).onChange((value) => {
@@ -67,7 +67,7 @@ export class EGVModal extends Modal {
 		buttonContainer.style.marginTop = "20px";
 
 		new ButtonComponent(buttonContainer)
-			.setButtonText("Export to File")
+			.setButtonText("Export to file")
 			.setCta()
 			.setClass("export-button")
 			.onClick(async () => {
@@ -75,7 +75,7 @@ export class EGVModal extends Modal {
 				this.plugin.settings.includeAttachments = this.includeAttachments;
 				await this.plugin.saveSettings();
 
-				const finalpath = await this.plugin.exportGraph(this.customFilename);
+				const finalpath = await this.plugin.exportGraph(normalizePath(this.customFilename));
 				if (finalpath) {
 					this.close();
 				}
