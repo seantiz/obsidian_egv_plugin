@@ -1,4 +1,4 @@
-import { App, Plugin, Notice, MetadataCache } from "obsidian";
+import { App, Plugin, Notice, MetadataCache, normalizePath } from "obsidian";
 import { type EGVSettings, type GraphData, DEFAULT_SETTINGS } from "schema";
 import { EGVSettingTab } from "settings";
 import { EGVModal } from "views";
@@ -39,10 +39,10 @@ export default class EGVPlugin extends Plugin {
 
 			let exportFilename: string;
 			if (providedFilename) {
-				exportFilename = providedFilename;
+				exportFilename = normalizePath(providedFilename);
 			} else {
 				const vaultName = this.app.vault.getName();
-				exportFilename = `${vaultName}-graph-data`;
+				exportFilename = normalizePath(`${vaultName}-graph-data`);
 			}
 
 			this.settings.lastExported = exportFilename;
@@ -55,7 +55,7 @@ export default class EGVPlugin extends Plugin {
 				filenameWithExtension = await this.exportDot(graphdata, exportFilename);
 			}
 
-			new Notice(`Graph data exported to ${this.getExportPath(filenameWithExtension)}`, 5000);
+			new Notice(`Graph data exported to ${normalizePath(this.getExportPath(filenameWithExtension))}`, 5000);
 
 			return filenameWithExtension;
 		} catch (error) {
@@ -92,7 +92,7 @@ export default class EGVPlugin extends Plugin {
 			}
 
 			nodes.set(file.path, {
-				id: file.path,
+				id: normalizePath(file.path),
 				name: file.basename,
 				type: "note",
 			});
@@ -104,7 +104,7 @@ export default class EGVPlugin extends Plugin {
 					if (nodes.size >= this.settings.maxNodes) return;
 
 					nodes.set(file.path, {
-						id: file.path,
+						id: normalizePath(file.path),
 						name: file.basename,
 						type: "attachment",
 					});
@@ -137,14 +137,14 @@ export default class EGVPlugin extends Plugin {
 
 	async exportMermaid(graphdata: GraphData, basepath: string) {
 		const mermaidContent = this.convertToMermaid(graphdata);
-		const filename = `${basepath}.mmd`;
+		const filename = normalizePath(`${basepath}.mmd`);
 		await this.app.vault.create(filename, mermaidContent);
 		return filename;
 	}
 
 	async exportDot(graphdata: GraphData, basepath: string) {
 		const dotContent = this.convertToDot(graphdata);
-		const filename = `${basepath}.dot`;
+		const filename = normalizePath(`${basepath}.dot`);
 		await this.app.vault.create(filename, dotContent);
 		return filename;
 	}
@@ -152,10 +152,10 @@ export default class EGVPlugin extends Plugin {
 	getExportPath(providedFilename: string = ""): string {
 		let exportFilename: string;
 		if (providedFilename) {
-			exportFilename = providedFilename;
+			exportFilename = normalizePath(providedFilename);
 		} else {
 			const vaultName = this.app.vault.getName();
-			exportFilename = `${vaultName}-graph-data`;
+			exportFilename = normalizePath(`${vaultName}-graph-data`);
 		}
 
 		const exportFolder = this.app.vault.getName();
