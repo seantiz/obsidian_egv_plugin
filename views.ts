@@ -61,10 +61,7 @@ export class EGVModal extends Modal {
 			text: `${connectedCount} notes have connections`,
 		});
 
-		const buttonContainer = contentEl.createDiv({ cls: "button-container" });
-		buttonContainer.style.display = "flex";
-		buttonContainer.style.justifyContent = "space-around";
-		buttonContainer.style.marginTop = "20px";
+		const buttonContainer = contentEl.createDiv({ cls: "view-button-section" });
 
 		new ButtonComponent(buttonContainer)
 			.setButtonText("Export to file")

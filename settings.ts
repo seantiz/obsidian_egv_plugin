@@ -69,9 +69,7 @@ export class EGVSettingTab extends PluginSettingTab {
 			cls: "help-text",
 		});
 
-		const buttonContainer = containerEl.createDiv();
-		buttonContainer.style.textAlign = "right";
-		buttonContainer.style.marginTop = "50px";
+		const buttonContainer = containerEl.createDiv({ cls: "settings-button-section" });
 
 		const quickExportButton = new ButtonComponent(buttonContainer)
 			.setButtonText("Go to plugin")

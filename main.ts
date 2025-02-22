@@ -15,7 +15,7 @@ export default class EGVPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: "export-graph-command",
+			id: "export-graph",
 			name: "Export Graph to File",
 			callback: () => {
 				new EGVModal(this.app, this).open();

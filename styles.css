@@ -26,3 +26,14 @@
 .root-notice {
 	font-size: 12px;
 }
+
+.section-button-section {
+	text-align: right;
+	margin-top: 50px;
+}
+
+.view-button-section {
+	display: flex;
+	justify-content: space-around;
+	margin-top: 20px;
+}
