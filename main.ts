@@ -10,13 +10,13 @@ export default class EGVPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.addRibbonIcon("dot-network", "Export Graph View", () => {
+		this.addRibbonIcon("dot-network", "Export graph view", () => {
 			new EGVModal(this.app, this).open();
 		});
 
 		this.addCommand({
 			id: "export-graph",
-			name: "Export Graph to File",
+			name: "Export graph to file",
 			callback: () => {
 				new EGVModal(this.app, this).open();
 			},
