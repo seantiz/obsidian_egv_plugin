@@ -1,4 +1,4 @@
-# Obsidian Export Graph View Plugin
+# Export Graph View Plugin
 
 This is an Obsidian community plugin for exporting your vault's notes and attachments metadata as graph files.
 
