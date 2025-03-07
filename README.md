@@ -4,7 +4,7 @@ This is an Obsidian community plugin for exporting your vault's notes and attach
 
 You can export in either `.mmd` (Mermaid) format or `.dot` (for GraphViz) format for all your data viz habits.
 
-There are a couple of other community plugins that can similar, but they enforce a pipeline where you have to use your exported data in a specific environment or program.
+There are a couple of other community plugins that can do similar, but they enforce a pipeline where you have to use your exported data within a specific environment or program.
 
 I personally wanted a more straightforward tool - welcome to EGV.
 
@@ -26,5 +26,3 @@ Max nodes is an arbitrary setting of anywhere up to 5000 nodes, but it is a safe
 ## Support
 
 This plugin is at version 1.0.0 - though it's really in beta when it comes to testing and code coverage. Please get in touch if you run into any bugs.
-
-This plugin is Zero BSD licensed.
