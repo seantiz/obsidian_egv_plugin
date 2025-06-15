@@ -25,4 +25,4 @@ Max nodes is an arbitrary setting of anywhere up to 5000 nodes, but it is a safe
 
 ## Support
 
-This plugin is at version 1.0.0 - though it's really in beta when it comes to testing and code coverage. Please get in touch if you run into any bugs.
+This plugin is really still in beta when it comes to testing. Please get in touch if you run into any bugs.
