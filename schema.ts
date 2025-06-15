@@ -4,6 +4,7 @@ export interface EGVSettings {
 	includeAttachments: boolean;
 	maxNodes: number;
 	lastExported: string;
+	includeWeights: boolean;
 }
 
 export const DEFAULT_SETTINGS: EGVSettings = {
@@ -12,12 +13,16 @@ export const DEFAULT_SETTINGS: EGVSettings = {
 	includeAttachments: false,
 	maxNodes: 1000,
 	lastExported: "",
+	includeWeights: false,
 };
 
-export interface GraphData {
+export interface Graph {
 	nodes: any[];
-	links: {
-		source: string;
-		target: string;
-	}[];
+	links: LinkMetadata[]
+}
+
+export interface LinkMetadata {
+	source: string,
+	target: string,
+	weight: number
 }

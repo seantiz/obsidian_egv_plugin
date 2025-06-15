@@ -1,6 +1,6 @@
 {
 	"name": "export-graph-view",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Export your Obsidian vault's graph view to mermaid and dot format.",
 	"main": "main.js",
 	"scripts": {
