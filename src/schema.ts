@@ -13,6 +13,11 @@ export interface EGVSettings {
 	// MMD
 	direction?: 'TD' | 'LR' | 'RL' | 'BT'
 	maxEPerV?: number
+	// MMD backoff
+	disableAutoBridging: boolean
+	maxNodes?: number
+	maxRelationships?: number
+	maxTags?: number
 }
 
 export const DEFAULT_SET: EGVSettings = {
@@ -26,6 +31,10 @@ export const DEFAULT_SET: EGVSettings = {
 	subgraphs: false,
 	direction: 'TD',
 	maxEPerV: 10,
+	disableAutoBridging: false,
+	maxNodes: 40,
+	maxRelationships: 60,
+	maxTags: 10,
 }
 
 // Processing structs

@@ -114,6 +114,11 @@ export class VaultWhisperer {
 				return Math.floor(Math.sqrt((2 * E_max * t) / Math.max(1, k)))
 			},
 			isTearing(E_max: number = 150): boolean {
+				// Respect the user override
+				if (this.settings.disableAutoBridging === true) {
+					return false
+				}
+
 				const N = this.getN()
 				const T = this.getT()
 				const K = this.getK()
@@ -458,9 +463,9 @@ export class VaultWhisperer {
 		relationships: NodeRelationship[],
 		vaultEnv: VaultEnv
 	): void {
-		const MAX_NODES = 40
-		const MAX_RELATIONSHIPS = 60
-		const MAX_TAGS = 10
+		const MAX_NODES = vaultEnv.settings.maxNodes || 40
+		const MAX_RELATIONSHIPS = vaultEnv.settings.maxRelationships || 60
+		const MAX_TAGS = vaultEnv.settings.maxTags || 10
 
 		console.log('Starting backoff task')
 
