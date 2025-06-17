@@ -22,11 +22,11 @@ interface VaultEnv {
 	nodes: Map<string, GraphNode>
 	relationships: NodeRelationship[]
 	settings: EGVSettings
-	getN(): number // Total number of notes
-	getT(): number // Total number of unique tags
-	getK(): number // Average tags per note
-	getOptimalN(E_max?: number): number // Calculate optimal note count based on formula
-	isPastSingularity(E_max?: number): boolean // Check if we're hitting Mermaid limits
+	getN(): number
+	getT(): number
+	getK(): number
+	getOptimalN(E_max?: number): number
+	isTearing(E_max?: number): boolean
 }
 
 export class VaultWhisperer {
@@ -108,7 +108,7 @@ export class VaultWhisperer {
 				const k = this.getK()
 				return Math.floor(Math.sqrt((2 * E_max * t) / Math.max(1, k)))
 			},
-			isPastSingularity(E_max: number = 150): boolean {
+			isTearing(E_max: number = 150): boolean {
 				const N = this.getN()
 				const T = this.getT()
 				const K = this.getK()
@@ -353,7 +353,7 @@ export class VaultWhisperer {
 				relationships: [...e],
 			}
 
-			if (tempEnv.isPastSingularity()) {
+			if (tempEnv.isTearing()) {
 				console.log('Singularity detected - applying backoff strategy')
 				this.backoffSingularity(vAndW, e, vaultEnv)
 			} else {
@@ -446,136 +446,107 @@ export class VaultWhisperer {
 		vaultEnv.relationships = e
 	}
 
-	// Mermaid specific to not tear the mermaid chart
+	// Mermaid-specific task when the initial mermaid graph object is tearing
+	// Creates a reduced graph G'(V',E') where |V'| + |E'| ≤ MAX_TOTAL_ELEMENTS - BRIDGING PATTERN
 	private backoffSingularity(
 		nodes: Map<string, GraphNode>,
 		relationships: NodeRelationship[],
 		vaultEnv: VaultEnv
 	): void {
-		// Strict limits for Mermaid rendering
-		const MAX_TOTAL_ELEMENTS = 100 // Total nodes + relationships
-		const MAX_NODES = 40 // Maximum number of nodes
-		const MAX_RELATIONSHIPS = 60 // Maximum number of relationships
+		const MAX_NODES = 40
+		const MAX_RELATIONSHIPS = 60
+		const MAX_TAGS = 10
 
-		console.log(
-			'Performing aggressive graph reduction for Mermaid compatibility'
-		)
+		console.log('Starting backoff task')
 
-		// Step 1: Build tag importance metrics
-		const tagClusters = new Map<string, string[]>()
-		const tagImportance = new Map<string, number>()
+		// Build the count of {E(v,w)}
+		const optimalVAndW = new Map<string, string[]>()
 
-		// Group notes by tag
 		relationships.forEach((rel) => {
-			const targetNode = nodes.get(rel.target)
-			if (targetNode?.type === 'tag') {
-				if (!tagClusters.has(rel.target)) {
-					tagClusters.set(rel.target, [])
+			const target = vaultEnv.nodes.get(rel.target)
+			if (target?.type === 'tag') {
+				if (!optimalVAndW.has(rel.target)) {
+					optimalVAndW.set(rel.target, [])
 				}
-				tagClusters.get(rel.target)!.push(rel.source)
+				optimalVAndW.get(rel.target)!.push(rel.source)
 			}
 		})
 
-		// Calculate tag importance: weighted by cluster size and connectivity potential
-		tagClusters.forEach((notes, tagId) => {
-			const clusterSize = notes.length
-			// Tags with moderate-sized clusters are most valuable (not too small, not too large)
-			const connectivityValue = Math.min(clusterSize, 10) // Cap value to avoid huge clusters dominating
-			const importanceScore =
-				connectivityValue * Math.log(clusterSize + 1)
-			tagImportance.set(tagId, importanceScore)
-		})
-
-		// Step 2: Select optimal number of tags based on our formula
-		const targetTagCount = Math.min(10, Math.ceil(MAX_NODES / 4))
-
-		const selectedTags = Array.from(tagClusters.entries())
-			.sort(
-				(a, b) =>
-					(tagImportance.get(b[0]) || 0) -
-					(tagImportance.get(a[0]) || 0)
-			)
-			.slice(0, targetTagCount)
+		// Select top tags by the amount of notes pointing to them - most important tags at the front of the pack
+		const survivingTags = Array.from(optimalVAndW.entries())
+			.sort((a, b) => b[1].length - a[1].length)
+			.slice(0, MAX_TAGS)
 			.map(([tagId]) => tagId)
 
-		// Step 3: Select most important notes per tag
-		const selectedNotes = new Set<string>()
-		const processedRelationships: NodeRelationship[] = []
-
-		// Distribute note quota among selected tags
-		const notesPerTag =
-			Math.floor(MAX_NODES - selectedTags.length) / selectedTags.length
-
-		selectedTags.forEach((tagId) => {
-			const notesForTag = tagClusters.get(tagId) || []
-
-			// Get most connected notes (those with most tags/connections)
-			const noteConnectionCounts = new Map<string, number>()
-
-			notesForTag.forEach((noteId) => {
-				relationships.forEach((rel) => {
-					if (rel.source === noteId) {
-						noteConnectionCounts.set(
-							noteId,
-							(noteConnectionCounts.get(noteId) || 0) + 1
-						)
-					}
-				})
+		// Score the E where E = (v_important, w) w being the notes - if we're looking for a bridging pattern in the overall mermaid chart
+		const noteScores = new Map<string, number>()
+		survivingTags.forEach((tagId) => {
+			optimalVAndW.get(tagId)?.forEach((noteId) => {
+				noteScores.set(noteId, (noteScores.get(noteId) || 0) + 1)
 			})
-
-			// Select top notes for this tag
-			const topNotesForTag = Array.from(notesForTag)
-				.sort(
-					(a, b) =>
-						(noteConnectionCounts.get(b) || 0) -
-						(noteConnectionCounts.get(a) || 0)
-				)
-				.slice(0, Math.max(2, Math.ceil(notesPerTag)))
-
-			// Add to selected notes
-			topNotesForTag.forEach((noteId) => selectedNotes.add(noteId))
 		})
 
-		// Step 4: Build final graph with strict limits
-		const finalNodes = new Map<string, GraphNode>()
-		const finalRelationships: NodeRelationship[] = []
+		// Select top notes based on E(v_important, w_most)
+		const survivingNotes = new Set(
+			Array.from(noteScores.entries())
+				.sort((a, b) => b[1] - a[1])
+				.slice(0, MAX_NODES - survivingTags.length)
+				.map(([noteId]) => noteId)
+		)
 
-		// Add selected tag nodes
-		selectedTags.forEach((tagId) => {
-			const tagNode = nodes.get(tagId)
-			if (tagNode) finalNodes.set(tagId, tagNode)
+		// Rebuild graph
+		nodes.clear()
+		relationships.length = 0
+
+		survivingTags.forEach((tagId) => {
+			const v = vaultEnv.nodes.get(tagId)
+			if (v) nodes.set(tagId, v)
 		})
 
-		// Add selected note nodes
-		selectedNotes.forEach((noteId) => {
-			const noteNode = nodes.get(noteId)
-			if (noteNode) finalNodes.set(noteId, noteNode)
+		survivingNotes.forEach((noteId) => {
+			const w = vaultEnv.nodes.get(noteId)
+			if (w) nodes.set(noteId, w)
 		})
 
-		// Add relationships, but only between selected nodes
-		relationships.forEach((rel) => {
-			if (finalNodes.has(rel.source) && finalNodes.has(rel.target)) {
-				finalRelationships.push(rel)
+		// Rebuild relationships for graph
+		let E = new Set<string>()
 
-				// If we exceed relationship limit, stop adding
-				if (finalRelationships.length >= MAX_RELATIONSHIPS) {
-					return
+		// First pass: tag-note connections
+		vaultEnv.relationships.forEach((rel) => {
+			if (
+				nodes.has(rel.source) &&
+				nodes.has(rel.target) &&
+				E.size < MAX_RELATIONSHIPS
+			) {
+				const sourceIsNote =
+					vaultEnv.nodes.get(rel.source)?.type !== 'tag'
+				const targetIsTag =
+					vaultEnv.nodes.get(rel.target)?.type === 'tag'
+
+				if (sourceIsNote && targetIsTag) {
+					relationships.push(rel)
+					E.add(`${rel.source}-${rel.target}`)
 				}
 			}
 		})
 
-		// Final verification
-		const totalElements = finalNodes.size + finalRelationships.length
+		// Second pass: remaining connections
+		vaultEnv.relationships.forEach((rel) => {
+			const relId = `${rel.source}-${rel.target}`
+			if (
+				nodes.has(rel.source) &&
+				nodes.has(rel.target) &&
+				!E.has(relId) &&
+				E.size < MAX_RELATIONSHIPS
+			) {
+				relationships.push(rel)
+				E.add(relId)
+			}
+		})
+
 		console.log(
-			`Final reduced graph: ${finalNodes.size} nodes, ${finalRelationships.length} relationships (${totalElements} total elements)`
+			`Final reduced graph: ${nodes.size} nodes, ${relationships.length} relationships (${nodes.size + relationships.length} total elements)`
 		)
-
-		// Apply our changes
-		nodes.clear()
-		finalNodes.forEach((node, key) => nodes.set(key, node))
-
-		relationships.length = 0
-		relationships.push(...finalRelationships)
 	}
 
 	private prune(
@@ -600,7 +571,7 @@ export class VaultWhisperer {
 		filteredNodes.forEach((node, key) => nodes.set(key, node))
 	}
 
-	// Applies DOT-specific features
+	// Some f(Weight(v,w), Format = .dot)
 	private runDotSettings(graph: Graph): void {
 		// Respect relationship weight setting
 		if (this.settings.includeWeights && this.settings.weightThreshold) {
@@ -622,44 +593,29 @@ export class VaultWhisperer {
 		})
 	}
 
-	// Applies Mermaid-specific features
+	// Some f(Weight(v,w), Format = .mmd)
 	private runMMDSettings(graph: Graph): void {
 		// Respect max-relationships-per-note setting
 		if (this.settings.maxEPerV) {
-			const outgoingArrows = new Map<string, number>()
+			const survivors: NodeRelationship[] = []
+			const cutoff = new Map<string, number>()
 
-			// Count outgoing edges per node
-			graph.relationships.forEach((rel) => {
-				outgoingArrows.set(
-					rel.source,
-					(outgoingArrows.get(rel.source) || 0) + 1
-				)
-			})
-
-			// Filter relationships for notes with too many connections
-			const filteredArrows: NodeRelationship[] = []
-			const processedArrows = new Map<string, number>()
-
-			// Sort by weight first to keep the most important relationships
-			const sortedRelationships = [...graph.relationships].sort(
+			// Most weighted notes at the front of the pack to survive any pruning
+			const survivingECandidates = [...graph.relationships].sort(
 				(a, b) => b.weight - a.weight
 			)
 
-			for (const rel of sortedRelationships) {
-				const sourceKey = rel.source
-				const currentCount = processedArrows.get(sourceKey) || 0
+			// Add important edges until we reach the mavEPerV cutoff point
+			for (const e of survivingECandidates) {
+				const eCount = cutoff.get(e.source) || 0
 
-				if (
-					currentCount < this.settings.maxEPerV ||
-					(outgoingArrows.get(sourceKey) || 0) <=
-						this.settings.maxEPerV
-				) {
-					filteredArrows.push(rel)
-					processedArrows.set(sourceKey, currentCount + 1)
+				if (eCount < this.settings.maxEPerV) {
+					survivors.push(e)
+					cutoff.set(e.source, eCount + 1)
 				}
 			}
 
-			graph.relationships = filteredArrows
+			graph.relationships = survivors
 		}
 	}
 
