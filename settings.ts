@@ -14,6 +14,7 @@ export class EGVSettingTab extends PluginSettingTab {
 		const { containerEl } = this
 		containerEl.empty()
 
+		// Root
 		new Setting(containerEl)
 			.setName('Export format')
 			.setDesc('Choose either a .mmd (Mermaid) or .dot (Graphviz) file')
@@ -27,13 +28,14 @@ export class EGVSettingTab extends PluginSettingTab {
 							| 'mmd'
 							| 'dot'
 						await this.plugin.saveSettings()
+						this.display()
 					})
 			)
 
 		new Setting(containerEl)
 			.setName('Include orphan notes')
 			.setDesc(
-				'Whether to include notes with no links to other notes by default'
+				'Whether to include notes with no relationship to other notes by default'
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -59,48 +61,102 @@ export class EGVSettingTab extends PluginSettingTab {
 			)
 
 		new Setting(containerEl)
-			.setName('Maximum nodes to export')
-			.setDesc('This is an optional safeguard against huge vaults.')
-			.addSlider((slider) =>
-				slider
-					.setLimits(100, 5000, 100)
-					.setValue(this.plugin.settings.maxNodes)
-					.setDynamicTooltip()
+			.setName('Relationship between notes')
+			.setDesc('Choose how notes are organised')
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption('tags', 'by tags')
+					.addOption('internalLinks', 'by internal links')
+					.addOption('folders', 'by folders')
+					.setValue(this.plugin.settings.relationshipStrategy)
 					.onChange(async (value) => {
-						this.plugin.settings.maxNodes = value
+						this.plugin.settings.relationshipStrategy = value as
+							| 'tags'
+							| 'internalLinks'
+							| 'folders'
 						await this.plugin.saveSettings()
 					})
 			)
 
-		const helpText = containerEl.createEl('p', {
-			text: "NOTE: Don't worry too much about max nodes here. The plugin's main view will let you know how many notes and attachments are set to be exported.",
-			cls: 'help-text',
-		})
+		// Either dot
+		if (this.plugin.settings.exportFormat === 'dot') {
+			new Setting(containerEl)
+				.setName('Include edge weights')
+				.setDesc(
+					'For rendering the strength of links between notes in editors like Gephi.'
+				)
+				.addToggle((toggle) =>
+					toggle
+						.setValue(this.plugin.settings.includeWeights)
+						.onChange(async (value) => {
+							this.plugin.settings.includeWeights = value
+							await this.plugin.saveSettings()
+						})
+				)
 
-		new Setting(containerEl)
-			.setName('Include relationship metadata')
-			.setDesc(
-				'For rendering the strength of links between notes in editors like Gephi. Only applies to .dot files.'
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.includeWeights)
-					.onChange(async (value) => {
-						this.plugin.settings.includeWeights = value
-						await this.plugin.saveSettings()
-					})
-			)
+			new Setting(containerEl)
+				.setName('Weight threshold')
+				.setDesc(
+					'Minimum weight for a relationship to be included in the graph.'
+				)
+				.addSlider((slider) =>
+					slider
+						.setLimits(1, 10, 1)
+						.setValue(this.plugin.settings.weightThreshold || 1)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							this.plugin.settings.weightThreshold = value
+							await this.plugin.saveSettings()
+						})
+				)
 
-		const buttonContainer = containerEl.createDiv({
-			cls: 'settings-button-section',
-		})
+			new Setting(containerEl)
+				.setName('Enable subgraphs')
+				.setDesc('Group nodes into subgraphs based on relationships.')
+				.addToggle((toggle) =>
+					toggle
+						.setValue(this.plugin.settings.subgraphs || false)
+						.onChange(async (value) => {
+							this.plugin.settings.subgraphs = value
+							await this.plugin.saveSettings()
+						})
+				)
 
-		const quickExportButton = new ButtonComponent(buttonContainer)
-			.setButtonText('Go to plugin')
-			.setCta()
-			.onClick(() => {
-				new EGVModal(this.app, this.plugin).open()
-			})
-		quickExportButton.setClass('quick-export-button')
+			// Either mermaid
+		} else if (this.plugin.settings.exportFormat === 'mmd') {
+			new Setting(containerEl)
+				.setName('Graph direction')
+				.setDesc('Choose your mermaid layout')
+				.addDropdown((dropdown) =>
+					dropdown
+						.addOption('TD', 'Top to Bottom')
+						.addOption('LR', 'Left to Right')
+						.addOption('RL', 'Right to Left')
+						.addOption('BT', 'Bottom to Top')
+						.setValue(this.plugin.settings.direction || 'TD')
+						.onChange(async (value) => {
+							this.plugin.settings.direction = value as
+								| 'TD'
+								| 'LR'
+								| 'RL'
+								| 'BT'
+							await this.plugin.saveSettings()
+						})
+				)
+
+			new Setting(containerEl)
+				.setName('Max relationships for each note')
+				.setDesc('Use this setting to de-clutter your mermaid chart')
+				.addSlider((slider) =>
+					slider
+						.setLimits(1, 20, 1)
+						.setValue(this.plugin.settings.maxEPerV || 8)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							this.plugin.settings.maxEPerV = value
+							await this.plugin.saveSettings()
+						})
+				)
+		}
 	}
 }
