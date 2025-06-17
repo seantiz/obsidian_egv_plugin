@@ -1,8 +1,13 @@
-import { DEFAULT_SET } from 'schema'
-import { EGVSettingTab } from 'settings'
-import { EGVModal } from 'views'
-import { VaultWhisperer } from 'whisperer'
-import type { EGVSettings, Graph, GraphNode, NodeRelationship } from 'schema'
+import { DEFAULT_SET } from 'src/schema'
+import { EGVSettingTab } from 'src/settings'
+import { EGVModal } from 'src/views'
+import { VaultWhisperer } from 'src/whisperer'
+import type {
+	EGVSettings,
+	Graph,
+	GraphNode,
+	NodeRelationship,
+} from 'src/schema'
 import {
 	App,
 	Plugin,

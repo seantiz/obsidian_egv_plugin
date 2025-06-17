@@ -1,4 +1,9 @@
-import type { EGVSettings, Graph, GraphNode, NodeRelationship } from 'schema'
+import type {
+	EGVSettings,
+	Graph,
+	GraphNode,
+	NodeRelationship,
+} from 'src/schema'
 import {
 	type App,
 	type Vault,

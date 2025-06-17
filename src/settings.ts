@@ -1,5 +1,5 @@
-import EGVPlugin from 'main'
-import { EGVModal } from 'views'
+import EGVPlugin from 'src/main'
+import { EGVModal } from 'src/views'
 import { App, PluginSettingTab, Setting, ButtonComponent } from 'obsidian'
 
 export class EGVSettingTab extends PluginSettingTab {
