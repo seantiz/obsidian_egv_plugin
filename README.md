@@ -1,28 +1,38 @@
+![Light mode version](docs/egv-light.svg#gh-light-mode-only)
+![Dark mode version](docs/egv-dark.svg#gh-dark-mode-only)
+
+---
+
 # Export Graph View Plugin
 
-This is an Obsidian community plugin for exporting your vault's notes and attachments metadata as graph files.
+Obsidian's built-in Graph View a must-have dynamic knowledge graph, but not everyone has Obsidian installed on their machine. Sometimes you need to carry a snapshot with you to paint your ideas to friends and colleagues - that's where EGV comes in.
 
-You can export in either `.mmd` (Mermaid) format or `.dot` (for GraphViz) format for all your data viz habits.
+EGV exports to two capable yet VERY different formats with that freedom in mind.
 
-There are a couple of other community plugins that can do similar, but they enforce a pipeline where you have to use your exported data within a specific environment or program.
+## Quick Start
 
-I personally wanted a more straightforward tool - welcome to EGV.
+1. Install from Community Plugins
+2. Chose focus mode (single parent or full graph)
+3. Choose relationship strategy (tags, links, folders)
+4. Export your new snapshot graph to your vault
+5. Open with any Mermaid/GraphViz tool
+6. Dataviz heaven on the go!
 
-## A Couple More Details
+## Easy Mermaid Graphs
+Mermaid's limited scale makes it suited to smaller graphs, yet its big strength is how portable mermaid can be with minimal setup.
 
-1. All graph files are exported to your vault's root folder.
-2. You can go to EGV either from the settings menu or the left-hand side menu in your vault.
+EGV's 'Single-parent focus' mode was built with `.mmd` format in mind. It's like a narrow lens on a specific note or tag you want to paint all relationships from in your exported chart. Try it out.
 
-## Memory Safety
+You're not forced to use Single-parent focus if you love `.mmd` format and want to try getting away with larger exported charts. EGV offers some safeguards in the Full graph mode for you to tweak here.
 
-You can use the Maximum Nodes Setting slider to hard limit the maximum nodes that can be included in the final file. Don't worry about this too much at first glance; the EGV plugin will let you know how many notes and attachments you're set to export.
+But, for bigger visuals, most people would recommend exporting to `.dot` format.
 
-Max nodes is an arbitrary setting of anywhere up to 5000 nodes, but it is a safeguard for when you're:
+## Bigger Snapshots with Dot (GraphViz)
 
-1. On a device with less memory
-2. Are dealing with a mature vault that holds a lot of notes
-3. Combination of the two factors above
+Full-graph focus is suited to `.dot` format and EGV lets you include relationship metadata in your exported `.dot` graph or cluster note-groups or tag-groups into subgraphs if you want to take full advantage of what `.dot` editors like Gephi can do.
 
-## Support
+# Support
 
-This plugin is really still in beta when it comes to testing. Please get in touch if you run into any bugs.
+Please post an issue or get in touch if you find any bugs. I've made a pretty big update for version 1.2.2 but I've yet to complete testing, so this plugin is still in beta.
+
+I'll be the first to admit I use Gephi (and .dot graphs) a couple of times a year at most, so I'm much less likely to notice if there are any problems in EGV's .dot workflow.
