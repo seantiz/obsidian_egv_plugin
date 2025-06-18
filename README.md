@@ -5,7 +5,7 @@
 
 # Export Graph View Plugin
 
-Obsidian's built-in Graph View a must-have dynamic knowledge graph, but not everyone has Obsidian installed on their machine. Sometimes you need to carry a snapshot with you to paint your ideas to friends and colleagues - that's where EGV comes in.
+Obsidian's built-in Graph View is a must-have dynamic knowledge graph, but not everyone has Obsidian installed on their machine. Sometimes you need to carry a snapshot with you to paint your ideas to friends and colleagues - that's where EGV comes in.
 
 EGV exports to two capable yet VERY different formats with that freedom in mind.
 
