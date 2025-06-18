@@ -1,5 +1,4 @@
-![Light mode version](docs/egv-light.svg#gh-light-mode-only)
-![Dark mode version](docs/egv-dark.svg#gh-dark-mode-only)
+![Export graph view header](docs/egv-dark.svg)
 
 ---
 
