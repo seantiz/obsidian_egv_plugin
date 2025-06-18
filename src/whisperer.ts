@@ -11,6 +11,7 @@ import {
 	normalizePath,
 	TFile,
 	TFolder,
+	Notice,
 } from 'obsidian'
 
 function cleanId(id: string) {
@@ -114,8 +115,12 @@ export class VaultWhisperer {
 				return Math.floor(Math.sqrt((2 * E_max * t) / Math.max(1, k)))
 			},
 			isTearing(E_max: number = 150): boolean {
+				// Never perform auto-reduction for single graphs
+				if (this.settings.viewMode === 'singleGraph') {
+					return false
+				}
 				// Respect the user override
-				if (this.settings.disableAutoBridging === true) {
+				if (this.settings.enableAutoBridge === false) {
 					return false
 				}
 
@@ -181,6 +186,12 @@ export class VaultWhisperer {
 				break
 			case 'folders':
 				this.plantFolders(vaultEnv)
+				break
+			case 'singleTag':
+				this.singleTagNetwork(vaultEnv)
+				break
+			case 'singleNote':
+				this.singleNoteNetwork(vaultEnv)
 				break
 		}
 
@@ -451,6 +462,87 @@ export class VaultWhisperer {
 		if (!vaultEnv.settings.includeOrphans) {
 			this.prune(vAndW, e)
 		}
+
+		vaultEnv.nodes = vAndW
+		vaultEnv.relationships = e
+	}
+
+	// Strategy: Filter for single tag as root
+	private singleTagNetwork(vaultEnv: VaultEnv): void {
+		const rootTag = this.settings.rootTag || ''
+		const vAndW = new Map<string, GraphNode>()
+		const e: NodeRelationship[] = []
+
+		// First, add the root tag if it exists
+		if (rootTag && vaultEnv.nodes.has(rootTag)) {
+			vAndW.set(rootTag, vaultEnv.nodes.get(rootTag)!)
+		} else {
+			new Notice(`Tag "${rootTag}" not found in your vault`)
+			return
+		}
+
+		// Find all notes related to this tag
+		vaultEnv.relationships.forEach((rel) => {
+			const targetNode = vaultEnv.nodes.get(rel.target)
+			const sourceNode = vaultEnv.nodes.get(rel.source)
+
+			// Include relationships where either source or target is the root tag
+			if (
+				(rel.target === rootTag && sourceNode?.type === 'note') ||
+				(rel.source === rootTag && targetNode?.type === 'note')
+			) {
+				// Add the note to the nodes map
+				if (rel.target === rootTag && sourceNode) {
+					vAndW.set(rel.source, sourceNode)
+				} else if (rel.source === rootTag && targetNode) {
+					vAndW.set(rel.target, targetNode)
+				}
+
+				e.push(rel)
+			}
+		})
+
+		vaultEnv.nodes = vAndW
+		vaultEnv.relationships = e
+	}
+
+	// Strategy: Filter for single note as root
+	private singleNoteNetwork(vaultEnv: VaultEnv): void {
+		const rootNote = this.settings.rootNote || ''
+		const vAndW = new Map<string, GraphNode>()
+		const e: NodeRelationship[] = []
+
+		// Find the note by title
+		const rootNotePath = Array.from(vaultEnv.nodes.entries()).find(
+			([key, node]) => node.type === 'note' && node.name === rootNote
+		)?.[0]
+
+		if (!rootNotePath) {
+			new Notice(`Note "${rootNote}" not found in your vault`)
+			return
+		}
+
+		// Add the root note
+		vAndW.set(rootNotePath, vaultEnv.nodes.get(rootNotePath)!)
+
+		// Find all relationships to root v note
+		vaultEnv.relationships.forEach((rel) => {
+			if (rel.source === rootNotePath) {
+				// Outgoing relationship
+				const targetNode = vaultEnv.nodes.get(rel.target)
+				if (targetNode) {
+					vAndW.set(rel.target, targetNode)
+					e.push(rel)
+				}
+			} else if (rel.target === rootNotePath) {
+				// Incoming relationship
+				const sourceNode = vaultEnv.nodes.get(rel.source)
+				if (sourceNode) {
+					vAndW.set(rel.source, sourceNode)
+					e.push(rel)
+				}
+			}
+		})
 
 		vaultEnv.nodes = vAndW
 		vaultEnv.relationships = e

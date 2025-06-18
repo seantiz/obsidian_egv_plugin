@@ -27,7 +27,7 @@ export default class EGVPlugin extends Plugin {
 
 		this.whisperer = new VaultWhisperer(this.app, this.settings)
 
-		this.addRibbonIcon('dot-network', 'Export graph view', () => {
+		this.addRibbonIcon('inspection-panel', 'Export graph view', () => {
 			new EGVModal(this.app, this).open()
 		})
 

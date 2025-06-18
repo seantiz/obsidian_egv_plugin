@@ -1,11 +1,20 @@
 // Pre-processing
 export interface EGVSettings {
+	// New devision path
+	viewMode?: 'singleGraph' | 'fullGraph' | 'notSet'
+
+	// Stable props
 	exportFormat: 'mmd' | 'dot'
 	includeOrphans: boolean
 	includeAttachments: boolean
 	lastExported: string
 	includeWeights: boolean
-	relationshipStrategy: 'tags' | 'internalLinks' | 'folders'
+	relationshipStrategy:
+		| 'tags'
+		| 'internalLinks'
+		| 'folders'
+		| 'singleTag'
+		| 'singleNote'
 	// Optional format-specific properties
 	// DOT
 	weightThreshold?: number
@@ -14,10 +23,14 @@ export interface EGVSettings {
 	direction?: 'TD' | 'LR' | 'RL' | 'BT'
 	maxEPerV?: number
 	// MMD backoff
-	disableAutoBridging: boolean
+	enableAutoBridge: boolean
+	manualBackoff: boolean
 	maxNodes?: number
 	maxRelationships?: number
 	maxTags?: number
+	// New single-strategy props for user input
+	rootTag?: string
+	rootNote?: string
 }
 
 export const DEFAULT_SET: EGVSettings = {
@@ -31,7 +44,8 @@ export const DEFAULT_SET: EGVSettings = {
 	subgraphs: false,
 	direction: 'TD',
 	maxEPerV: 10,
-	disableAutoBridging: false,
+	enableAutoBridge: true,
+	manualBackoff: false,
 	maxNodes: 40,
 	maxRelationships: 60,
 	maxTags: 10,
