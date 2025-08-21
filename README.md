@@ -32,6 +32,6 @@ Full-graph focus is suited to `.dot` format and EGV lets you include relationshi
 
 # Support
 
-Please post an issue or get in touch if you find any bugs. I've made a pretty big update for version 1.2.2 but I've yet to complete testing, so this plugin is still in beta.
+Please post an issue or get in touch if you find any bugs. I've made a pretty big update for version 1.2.2 (we're now at 1.2.3) but I've yet to complete testing, so this plugin is still in beta.
 
 I'll be the first to admit I use Gephi (and .dot graphs) a couple of times a year at most, so I'm much less likely to notice if there are any problems in EGV's .dot workflow.
