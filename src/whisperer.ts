@@ -746,7 +746,7 @@ export class VaultWhisperer {
 	// Injects the final dot content
 	runDotPrinter(graph: Graph): string {
 		const vaultName = this.app.vault.getName()
-		let dot = `digraph ${vaultName} {\n`
+		let dot = `digraph "${vaultName}" {\n`
 		dot += '    rankdir=LR;\n'
 		dot += '    node [shape=box, style=rounded];\n'
 
