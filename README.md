@@ -1,10 +1,6 @@
-![Export graph view header](docs/egv-dark.svg)
-
----
-
 # Export Graph View Plugin
 
-Obsidian's built-in Graph View is a must-have dynamic knowledge graph, but not everyone has Obsidian installed on their machine. Sometimes you need to carry a snapshot with you to paint your ideas to friends and colleagues - that's where EGV comes in.
+Obsidian's built-in Graph View is great, but not everyone has Obsidian installed on their machine. Sometimes you need to carry a snapshot with you to paint your ideas to friends and colleagues, and that's where EGV comes in.
 
 EGV exports to two capable yet VERY different formats with that freedom in mind.
 
@@ -22,16 +18,13 @@ Mermaid's limited scale makes it suited to smaller graphs, yet its big strength 
 
 EGV's 'Single-parent focus' mode was built with `.mmd` format in mind. It's like a narrow lens on a specific note or tag you want to paint all relationships from in your exported chart. Try it out.
 
-You're not forced to use Single-parent focus if you love `.mmd` format and want to try getting away with larger exported charts. EGV offers some safeguards in the Full graph mode for you to tweak here.
-
-But, for bigger visuals, most people would recommend exporting to `.dot` format.
+Then, for bigger visuals, exporting to `.dot` format is the recommend format.
 
 ## Bigger Snapshots with Dot (GraphViz)
 
 Full-graph focus is suited to `.dot` format and EGV lets you include relationship metadata in your exported `.dot` graph or cluster note-groups or tag-groups into subgraphs if you want to take full advantage of what `.dot` editors like Gephi can do.
 
 # Support
+This tiny plugin is only passively maintained when I get an mail about package updates. I don't often use EGV anymore in my day to day.
 
-Please post an issue or get in touch if you find any bugs. I've made a pretty big update for version 1.2.2 (we're now at 1.2.3) but I've yet to complete testing, so this plugin is still in beta.
-
-I'll be the first to admit I use Gephi (and .dot graphs) a couple of times a year at most, so I'm much less likely to notice if there are any problems in EGV's .dot workflow.
+Get in touch or create a Github issue if there's ever a blocking error.
